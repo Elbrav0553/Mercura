@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Database\Seeders\ProductSeeder;
 use Database\Seeders\OptionSeeder;
 use Database\Seeders\QuoteSeeder;
+use Database\Seeders\ProductTranslationsSeeder;
 use Tests\TestCase;
 
 class QuotesApiTest extends TestCase
@@ -25,6 +26,7 @@ class QuotesApiTest extends TestCase
         $this->seed(ProductSeeder::class);
         $this->seed(OptionSeeder::class);
         $this->seed(QuoteSeeder::class);
+        $this->seed(ProductTranslationsSeeder::class);
         
     }
     /**
@@ -75,7 +77,6 @@ class QuotesApiTest extends TestCase
             "products"=> [
                 [
                     "id"=> 1,
-                    "name"=> "basic bicycle model",
                     "base_price"=> 50,
                     "quote_id"=> 1,
                     "created_at"=> null,
@@ -107,7 +108,6 @@ class QuotesApiTest extends TestCase
             "products" => [
                 [
                     "id" => 4,
-                    "name" => "basic bicycle model",
                     "base_price" => 50,
                     "quote_id" => 4,
                     "created_at" => null,
