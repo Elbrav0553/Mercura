@@ -30,8 +30,8 @@ class ProductController extends Controller
     public function show(string $product_id, $language = null)
     {
 
+        $product = Product::getProductFormDB($product_id, $language);
         
-        $product = Product::with('options')->find($product_id);
         if ($product) {         
             return response()->json($product, 200);
         } else {
