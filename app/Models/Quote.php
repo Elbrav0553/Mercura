@@ -42,7 +42,7 @@ class Quote extends Model
             foreach ($data['products'] as $productData) {
                 $product = Product::create([
                     'id' => $productData['id'],
-                    'name' => $productData['name'],
+                    //'name' => $productData['name'],
                     'base_price' => $productData['base_price'],
                     'quote_id' => $quote->id,
                     'created_at' => $productData['created_at'],
