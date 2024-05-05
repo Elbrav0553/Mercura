@@ -2,11 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Models\OptionTranslation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\WithFaker;
 use Database\Seeders\ProductSeeder;
 use Database\Seeders\OptionSeeder;
+use Database\Seeders\OptionTranslationsSeeder;
 use Database\Seeders\ProductTranslationsSeeder;
 use Tests\TestCase;
 
@@ -24,6 +26,7 @@ class ProductApiTest extends TestCase
         $this->seed(ProductSeeder::class);
         $this->seed(ProductTranslationsSeeder::class);
         $this->seed(OptionSeeder::class);
+        $this->seed(OptionTranslationsSeeder::class);
     }
     /**
      * Test GET return JSON with Products.
@@ -106,14 +109,28 @@ class ProductApiTest extends TestCase
             "options"=> [
                 [
                     "id"=> 1,
-                    "name"=> "road",
-                    "description"=> null,
                     "image_url"=> null,
                     "price"=> 10,
                     "item_number"=> "1",
                     "product_id"=> 1,
                     "created_at"=> null,
-                    "updated_at"=> null
+                    "updated_at"=> null,
+                    "option_translations"=> [
+                        [
+                            "id"=> 1,
+                            "option_id"=> 1,
+                            "locale"=> "en",
+                            "name"=> "road",
+                            "description"=> null
+                        ],
+                        [
+                            "id"=> 2,
+                            "option_id"=> 1,
+                            "locale"=> "es",
+                            "name"=> "carretera",
+                            "description"=> null
+                        ]
+                    ]
                 ]
             ]
         ]);
@@ -140,14 +157,18 @@ class ProductApiTest extends TestCase
             "options"=> [
                 [
                     "id"=> 1,
-                    "name"=> "road",
-                    "description"=> null,
                     "image_url"=> null,
                     "price"=> 10,
                     "item_number"=> "1",
                     "product_id"=> 1,
                     "created_at"=> null,
-                    "updated_at"=> null
+                    "updated_at"=> null,
+                    "option_translations"=> [
+                        [
+                            "option_id"=> 1,
+                            "name"=> "carretera"
+                        ]
+                    ]
                 ]
             ]
         ]);
