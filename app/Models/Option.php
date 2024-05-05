@@ -9,10 +9,15 @@ class Option extends Model
 {
     use HasFactory;
     
-    protected $fillable = ['name', 'description', 'image_url', 'price', 'item_number', 'product_id'];
+    protected $fillable = ['image_url', 'price', 'item_number', 'product_id'];
 
     public function product()
     {
         return $this->belongsTo(Product::class);
     }
+    public function OptionTranslations()
+    {
+        return $this->hasMany(OptionTranslation::class);
+    }
+
 }

@@ -32,12 +32,21 @@ class Product extends Model
         
     }
     public static function getProductFormDBWithLanguage($product_id, $language){
-        return Product::with(['ProductTranslations' => function ($query) use ($language) {
-            $query->where('locale', $language)->select('product_id', 'name');
-        }, 'options'])->find($product_id);
+        
+        return Product::with(
+            ['ProductTranslations' => function ($query) use ($language) 
+                {
+                    $query->where('locale', $language)->select('product_id', 'name');
+                }, 
+                'options.OptionTranslations' => function ($query) use ($language) 
+                {
+                    $query->where('locale', $language)->select('option_id', 'name', 'description');
+                }
+            ]
+        )->find($product_id);
     }
     public static function getProductFormDBWithOutLanguage($product_id){
-        return Product::with(['ProductTranslations','options'])->find($product_id);
+        return Product::with(['ProductTranslations','options.OptionTranslations'])->find($product_id);
     }
     
     /*
