@@ -10,64 +10,76 @@ class Quote extends Model
 {
     use HasFactory;
     protected $fillable = ['user_information'];
-    
+
     public function products()
     {
         return $this->hasMany(Product::class);
     }
 
-    public function calculateTotalPrice() 
+    public function calculateTotalPrice()
     {
-        $this->load('products.options');
-        $this->totalPrice = 0;
 
+        $totalPrice = 0;
         foreach ($this->products as $product) {
-            $this->totalPrice += $product->base_price;
+            $totalPrice += $product->base_price;
             foreach ($product->options as $option) {
-                $this->totalPrice += ($option->price * $option->item_number);
+                $totalPrice += ($option->price * $option->item_number);
             }
         }
 
-        return $this->totalPrice;
+        return $totalPrice;
     }
 
-    public static function storeQuotesInDBFromJS($data){
+    public static function storeQuotesInDBFromJS($data)
+    {
         DB::beginTransaction();
         try {
-           
+
             $quote = new Quote;
             $quote->user_information = $data['user_information'];
             $quote->save();
 
+
             foreach ($data['products'] as $productData) {
-                $product = Product::create([
-                    'id' => $productData['id'],
-                    //'name' => $productData['name'],
-                    'base_price' => $productData['base_price'],
-                    'quote_id' => $quote->id,
-                    'created_at' => $productData['created_at'],
-                    'updated_at' => $productData['updated_at'],
-                ]);
+                $product = new Product();
+                $product->base_price = $productData['base_price'];
+                $product->quote_id = $quote->id;
+                $product->save();
+
+                foreach ($productData['product_translations'] as $productData_translations) {
+                    $producttranslation = new ProductTranslation();
+                    $producttranslation->product_id = $product->id;
+                    $producttranslation->locale = $productData_translations['locale'];
+                    $producttranslation->name = $productData_translations['name'];
+                    $producttranslation->save();
+                }
+                foreach ($productData['options'] as $optionData) {
+                    $option = new Option();
+                    $option->image_url = $optionData['image_url'];
+                    $option->price = $optionData['price'];
+                    $option->item_number = $optionData['item_number'];
+                    $option->product_id = $product->id;
+                    $option->created_at = $optionData['created_at'];
+                    $option->updated_at = $optionData['updated_at'];
+                    $option->save();
+
+                    foreach ($optionData['optiontranslations'] as $optionData_translations) {
+                        $optiontranslation = new OptionTranslation();
+                        $optiontranslation->option_id = $option->id;
+                        $optiontranslation->locale = $optionData_translations['locale'];
+                        $optiontranslation->name = $optionData_translations['name'];
+                        $optiontranslation->description = $optionData_translations['description'];
+                        $optiontranslation->save();
+                    }
+                }
             }
-            foreach ($productData['options'] as $optionData) {
-                Option::create([
-                    'id' => $optionData['id'],
-                    'name' => $optionData['name'],
-                    'description' => $optionData['description'],
-                    'image_url' => $optionData['image_url'],
-                    'price' => $optionData['price'],
-                    'item_number' => $optionData['item_number'],
-                    'product_id' => $product->id,
-                    'created_at' => $optionData['created_at'],
-                    'updated_at' => $optionData['updated_at'],
-                ]);
-            }
-            
+
+
             DB::commit();
             return response()->json($quote, 201);
         } catch (\Throwable $th) {
             DB::rollback();
-            echo "<br> ".$th;
+            echo "<br> " . $th;
             return response()->json(['error' => 'quote not found'], 404);
         }
     }

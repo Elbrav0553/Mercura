@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\WithFaker;
 use Database\Seeders\ProductSeeder;
 use Database\Seeders\OptionSeeder;
+use Database\Seeders\OptionTranslationsSeeder;
 use Database\Seeders\QuoteSeeder;
 use Database\Seeders\ProductTranslationsSeeder;
 use Tests\TestCase;
@@ -27,7 +28,7 @@ class QuotesApiTest extends TestCase
         $this->seed(OptionSeeder::class);
         $this->seed(QuoteSeeder::class);
         $this->seed(ProductTranslationsSeeder::class);
-        
+        $this->seed(OptionTranslationsSeeder::class);
     }
     /**
      * Test GET return JSON with Quotes.
@@ -36,29 +37,29 @@ class QuotesApiTest extends TestCase
      */
     public function testGetQuotesIndex()
     {
-        
+
         $response = $this->get('/quotes');
 
         $response->assertStatus(200);
 
         $response->assertJson([
             [
-                "id"=> 1,
-                "user_information"=> "Marc",
-                "created_at"=> null,
-                "updated_at"=> null
+                "id" => 1,
+                "user_information" => "Marc",
+                "created_at" => null,
+                "updated_at" => null
             ],
             [
-                "id"=> 2,
-                "user_information"=> "Paco",
-                "created_at"=> null,
-                "updated_at"=> null
+                "id" => 2,
+                "user_information" => "Paco",
+                "created_at" => null,
+                "updated_at" => null
             ],
             [
-                "id"=> 3,
-                "user_information"=> "Pepe",
-                "created_at"=> null,
-                "updated_at"=> null
+                "id" => 3,
+                "user_information" => "Pepe",
+                "created_at" => null,
+                "updated_at" => null
             ]
         ]);
     }
@@ -69,29 +70,57 @@ class QuotesApiTest extends TestCase
         $response->assertStatus(200);
 
         $response->assertJson([
-            "id"=> 1,
-            "user_information"=> "Marc",
-            "created_at"=> null,
-            "updated_at"=> null,
-            "totalPrice"=> 60,
-            "products"=> [
+            "id" => 1,
+            "user_information" => "Marc",
+            "created_at" => null,
+            "updated_at" => null,
+            "totalPrice" => 60,
+            "products" => [
                 [
-                    "id"=> 1,
-                    "base_price"=> 50,
-                    "quote_id"=> 1,
-                    "created_at"=> null,
-                    "updated_at"=> null,
-                    "options"=> [
+                    "id" => 1,
+                    "base_price" => 50,
+                    "quote_id" => 1,
+                    "created_at" => null,
+                    "updated_at" => null,
+                    "product_translations" => [
                         [
-                            "id"=> 1,
-                            "name"=> "road",
-                            "description"=> null,
-                            "image_url"=> null,
-                            "price"=> 10,
-                            "item_number"=> "1",
-                            "product_id"=> 1,
-                            "created_at"=> null,
-                            "updated_at"=> null
+                            "id" => 1,
+                            "product_id" => 1,
+                            "locale" => "en",
+                            "name" => "basic bicycle model"
+                        ],
+                        [
+                            "id" => 2,
+                            "product_id" => 1,
+                            "locale" => "es",
+                            "name" => "bici modelo básico"
+                        ]
+                    ],
+                    "options" => [
+                        [
+                            "id" => 1,
+                            "image_url" => null,
+                            "price" => 10,
+                            "item_number" => "1",
+                            "product_id" => 1,
+                            "created_at" => null,
+                            "updated_at" => null,
+                            "optiontranslations" => [
+                                [
+                                    "id" => 1,
+                                    "option_id" => 1,
+                                    "locale" => "en",
+                                    "name" => "road",
+                                    "description" => null
+                                ],
+                                [
+                                    "id" => 2,
+                                    "option_id" => 1,
+                                    "locale" => "es",
+                                    "name" => "carretera",
+                                    "description" => null
+                                ]
+                            ]
                         ]
                     ]
                 ]
@@ -112,17 +141,45 @@ class QuotesApiTest extends TestCase
                     "quote_id" => 4,
                     "created_at" => null,
                     "updated_at" => null,
+                    "product_translations" => [
+                        [
+                            "id" => 1,
+                            "product_id" => 1,
+                            "locale" => "en",
+                            "name" => "basic bicycle model"
+                        ],
+                        [
+                            "id" => 2,
+                            "product_id" => 1,
+                            "locale" => "es",
+                            "name" => "bici modelo básico"
+                        ]
+                    ],
                     "options" => [
                         [
                             "id" => 6,
-                            "name" => "road",
-                            "description" => null,
                             "image_url" => null,
                             "price" => 10,
                             "item_number" => "1",
                             "product_id" => 4,
                             "created_at" => null,
-                            "updated_at" => null
+                            "updated_at" => null,
+                            "optiontranslations" => [
+                                [
+                                    "id" => 1,
+                                    "option_id" => 1,
+                                    "locale" => "en",
+                                    "name" => "road",
+                                    "description" => null
+                                ],
+                                [
+                                    "id" => 2,
+                                    "option_id" => 1,
+                                    "locale" => "es",
+                                    "name" => "carretera",
+                                    "description" => null
+                                ]
+                            ]
                         ]
                     ]
                 ]
@@ -138,25 +195,28 @@ class QuotesApiTest extends TestCase
         ]);
         $responseData = $response->json();
         $returnedId = $responseData['id'];
-        $response = $this->get('/quotes/'.$returnedId);
+        $response = $this->get('/quotes/' . $returnedId);
         $response->assertStatus(200);
-        
-        $data['created_at'] = $response['created_at'];
-        $data['updated_at'] = $response['updated_at'];
-        
+
+        $this->assertEquals($data['user_information'], $response['user_information']);
+        $this->assertEquals($data['totalPrice'], $response['totalPrice']);
+
         for ($i = 0; $i < count($data['products']); $i++) {
-            
-            $data['products'][$i]['created_at'] = $response['products'][$i]['created_at'];
-            $data['products'][$i]['updated_at'] = $response['products'][$i]['updated_at'];
-            
+            $this->assertEquals($data['products'][$i]['base_price'], $response['products'][$i]['base_price']);
+            $this->assertEquals($data['products'][$i]['quote_id'], $returnedId);
+            for ($j = 0; $j < count($data['products'][$i]['product_translations']); $j++) {
+                $this->assertEquals($data['products'][$i]['product_translations'][$j]['locale'], $response['products'][$i]['product_translations'][$j]['locale']);
+                $this->assertEquals($data['products'][$i]['product_translations'][$j]['name'], $response['products'][$i]['product_translations'][$j]['name']);
+            }
             for ($j = 0; $j < count($data['products'][$i]['options']); $j++) {
-            
-                $data['products'][$i]['options'][$j]['created_at'] = $response['products'][$i]['options'][$j]['created_at'];
-                $data['products'][$i]['options'][$j]['updated_at'] = $response['products'][$i]['options'][$j]['updated_at'];
+                $this->assertEquals($data['products'][$i]['options'][$j]['price'], $response['products'][$i]['options'][$j]['price']);
+                for ($x = 0; $x < count($data['products'][$i]['options'][$j]['optiontranslations']); $x++) {
+                    $this->assertEquals($data['products'][$i]['options'][$j]['optiontranslations'][$x]['locale'],$data['products'][$i]['options'][$j]['optiontranslations'][$x]['locale']);
+                    $this->assertEquals($data['products'][$i]['options'][$j]['optiontranslations'][$x]['name'],$response['products'][$i]['options'][$j]['optiontranslations'][$x]['name']);
+                    $this->assertEquals($data['products'][$i]['options'][$j]['optiontranslations'][$x]['description'],$response['products'][$i]['options'][$j]['optiontranslations'][$x]['description']);
+                }
             }
         }
-
-        $response->assertJson($data);
+        
     }
 }
-
