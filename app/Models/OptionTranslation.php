@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class OptionTranslation extends Model
 {
     use HasFactory;
+    public $timestamps = false;
     protected $fillable = ['name', 'description'];
 
     public function OptionTranslations()

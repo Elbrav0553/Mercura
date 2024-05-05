@@ -41,9 +41,13 @@ class QuoteController extends Controller
     public function show(string $quote_id)
     {
 
-        $quote = Quote::with('products.options')->find($quote_id);
-        $quote->totalPrice = $quote->calculateTotalPrice();
+        $quote = Quote::with([
+            'products.ProductTranslations',
+            'products.options.optiontranslations'
+
+        ])->find($quote_id);
         
+        $quote->totalPrice = $quote->calculateTotalPrice();
 
         if ($quote) {
             return response()->json($quote, 200);
